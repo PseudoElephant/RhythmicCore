@@ -1,22 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Net.NetworkInformation;
-using System.Transactions;
-using UnityEngine;
 
-public class Measure
+public class LevelModel
 {
-    private TimeSignature _timeSignature;
-    private Dictionary<int, RhythmicValue> _rhythmicValues;
-    private Dictionary<int, Trigger> _triggers;
-
-    public Measure(TimeSignature timeSignature)
-    {
-        _timeSignature = timeSignature;
-        _rhythmicValues = new Dictionary<int, RhythmicValue>();
-        _triggers = new Dictionary<int, Trigger>();
-    }
-
+    private Level _level;
+    
     public void AddTrigger(Trigger.TriggerType type, int position)
     {
         throw new NotImplementedException();
@@ -27,9 +15,9 @@ public class Measure
         throw new NotImplementedException();
     }
 
-    public Dictionary<int, Trigger> GetTriggers()
+    public Dictionary<int, Trigger> GetTriggers(int measureId)
     {
-        return _triggers;
+        return _level.LevelData.Measures[measureId].Triggers;
     }
 
     public Trigger GetTriggerAtPosition(int position)
@@ -47,9 +35,9 @@ public class Measure
         throw new NotImplementedException();
     }
 
-    public Dictionary<int, RhythmicValue> GetRhythmicValues()
+    public Dictionary<int, RhythmicValue> GetRhythmicValues(int measureId)
     {
-        return _rhythmicValues;
+        return _level.LevelData.Measures[measureId].RhythmicValues;
     }
     
     public RhythmicValue GetRhythmicValueAtPosition(int position)
@@ -57,14 +45,14 @@ public class Measure
         throw new NotImplementedException();
     }
 
-    public TimeSignature GetTimeSignature()
+    public TimeSignature GetTimeSignature(int measureId)
     {
-        return _timeSignature;
+        return _level.LevelData.Measures[measureId].TimeSignature;
     }
 
-    public void ChangeTimeSignature(TimeSignature newTimeSignature)
+    public void ChangeTimeSignature(int measureId, TimeSignature newTimeSignature)
     {
-        _timeSignature = newTimeSignature;
+        _level.LevelData.Measures[measureId].TimeSignature = newTimeSignature;
         ///TODO: Think properly if you have to reorganize all _rhythmic values and triggers here
     }
 
