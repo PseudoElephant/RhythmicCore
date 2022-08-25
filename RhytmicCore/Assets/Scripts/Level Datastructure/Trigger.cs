@@ -1,3 +1,5 @@
+using System;
+
 public class Trigger
 {
     public enum TriggerType
@@ -10,5 +12,6 @@ public class Trigger
         TimeSignature
     }
 
+    public Guid TriggerID { get; } = new Guid();
     public TriggerType Type;
 }
