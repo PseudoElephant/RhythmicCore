@@ -13,7 +13,7 @@ public class RhythmicValue
         Tuple
     }
 
-    public RhythmicValueType Value;
+    public RhythmicValueType Type;
     public bool IsDotted;
     public bool HasTie;
 }

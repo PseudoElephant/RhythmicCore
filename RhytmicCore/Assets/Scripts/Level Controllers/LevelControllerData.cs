@@ -86,18 +86,23 @@ public class LevelControllerData
     /// <returns>A Dictionary containing all of the triggers. The key is the sub-beat, and the value is a list of type <see cref="Trigger"/> which contains the triggers at the specified sub-beat. </returns>
     public Dictionary<int, List<Trigger>> GetTriggersOnMeasure(int measureId)
     {
+        if (measureId >= _levelData.Measures.Count) throw new Exception(_measureOutOfBounds);
+        
         return _levelData.Measures[measureId].Triggers;
     }
 
     /// <summary>
-    /// Returns a list of all the triggers at the specified measure and sub-beat.
+    /// Returns a list of all the triggers at the specified measure and sub-beat. If there are no triggers it returns null.
     /// </summary>
     /// <param name="measureId">An int representing the ID of the measure of the trigger.</param>
     /// <param name="subBeat">An in representing the sub-beat of the trigger(s) within the measure.</param>
     /// <returns>A list of type <see cref="Trigger"/> with all the triggers at the specified sub-beat.</returns>
     public List<Trigger> GetTriggersAtPosition(int measureId, int subBeat)
     {
-        throw new NotImplementedException();
+        if (measureId >= _levelData.Measures.Count) throw new Exception(_measureOutOfBounds);
+        if (!IsProperSubBeat(measureId, subBeat)) throw new Exception(_subBeatOutOfBounds);
+
+        return _levelData.Measures[measureId].Triggers[subBeat];
     }
 
     /// <summary>
@@ -108,17 +113,38 @@ public class LevelControllerData
     /// <param name="type">The <see cref="RhythmicValue.RhythmicValueType"/> representing the type of rhythmic value.</param>
     public void AddRhythmicValue(int measureId, int subBeat, RhythmicValue.RhythmicValueType type)
     {
-        throw new NotImplementedException();
+        if (measureId >= _levelData.Measures.Count) throw new Exception(_measureOutOfBounds);
+        if (!IsProperSubBeat(measureId, subBeat)) throw new Exception(_subBeatOutOfBounds);
+        
+        Dictionary<int, RhythmicValue> rhythmicValues = _levelData.Measures[measureId].RhythmicValues;
+
+        RhythmicValue newRhythmicValue = new RhythmicValue();
+        newRhythmicValue.Type = type;
+        
+        if (!rhythmicValues.ContainsKey(subBeat)) // If there is no prev note
+        {
+            rhythmicValues.Add(subBeat, newRhythmicValue);
+            return;
+        }
+        
+        //TODO: What to do if there is already a note? Replace? Exception? Add code below
+        // Code here
     }
 
     /// <summary>
-    /// Removes the RhythmicValue at the specified measure and sub-beat, from the level data.
+    /// Removes the RhythmicValue at the specified measure and sub-beat. Returns true if removed, else false.
     /// </summary>
     /// <param name="measureId">An in representing the ID of the measure to which to remove the rhythmic value.</param>
     /// <param name="subBeat">An int representing the sub-beat of the rhythmic value within the measure.</param>
-    public void RemoveRhythmicValue(int measureId, int subBeat)
+    /// <returns>True if removed, otherwise false.</returns>
+    public bool RemoveRhythmicValue(int measureId, int subBeat)
     {
-        throw new NotImplementedException();
+        if (measureId >= _levelData.Measures.Count) throw new Exception(_measureOutOfBounds);
+        if (!IsProperSubBeat(measureId, subBeat)) throw new Exception(_subBeatOutOfBounds);
+        
+        Dictionary<int, RhythmicValue> rhythmicValues = _levelData.Measures[measureId].RhythmicValues;
+
+        return rhythmicValues.Remove(subBeat);
     }
 
     /// <summary>
@@ -128,18 +154,30 @@ public class LevelControllerData
     /// <returns>A Dictionary containing all of the rhythmic values. The key is the sub-beat, and the value is <see cref="RhythmicValue"/>. </returns>
     public Dictionary<int, RhythmicValue> GetRhythmicValuesOnMeasure(int measureId)
     {
+        if (measureId >= _levelData.Measures.Count) throw new Exception(_measureOutOfBounds);
+        
         return _levelData.Measures[measureId].RhythmicValues;
     }
 
     /// <summary>
-    /// Returns the RhythmicValue at the specified measure and sub-beat.
+    /// Returns the RhythmicValue at the specified measure and sub-beat. Returns null if there is none.
     /// </summary>
     /// <param name="measureId">An in representing the ID of the measure of the rhythmic value.</param>
     /// <param name="subBeat">An int representing the sub-beat of the rhythmic value within the measure.</param>
     /// <returns>A <see cref="RhythmicValue"/> representing the note or rest at the given measure and sub-beat.</returns>
     public RhythmicValue GetRhythmicValueAtPosition(int measureId, int subBeat)
     {
-        throw new NotImplementedException();
+        if (measureId >= _levelData.Measures.Count) throw new Exception(_measureOutOfBounds);
+        if (!IsProperSubBeat(measureId, subBeat)) throw new Exception(_subBeatOutOfBounds);
+
+        Dictionary<int, RhythmicValue> rhythmicValues = _levelData.Measures[measureId].RhythmicValues;
+        
+        if (!rhythmicValues.ContainsKey(subBeat))
+        {
+            return null;
+        }
+
+        return rhythmicValues[subBeat];
     }
 
     /// <summary>
@@ -150,7 +188,15 @@ public class LevelControllerData
     /// <param name="isDotted">A bool representing if the value is to be dotted or not.</param>
     public void SetRhythmicValueIsDottedAtPosition(int measureId, int subBeat, bool isDotted)
     {
-        throw new NotImplementedException();
+        if (measureId >= _levelData.Measures.Count) throw new Exception(_measureOutOfBounds);
+        if (!IsProperSubBeat(measureId, subBeat)) throw new Exception(_subBeatOutOfBounds);
+            
+        RhythmicValue rhythmicValue = _levelData.Measures[measureId].RhythmicValues[subBeat];
+
+        if (rhythmicValue != null)
+        {
+            rhythmicValue.IsDotted = isDotted;
+        }
     }
 
     /// <summary>
@@ -161,7 +207,15 @@ public class LevelControllerData
     /// <param name="hasTie">A bool representing if the value is to be tied to the next note or not.</param>
     public void SetRhythmicValueHasTieAtPosition(int measureId, int subBeat, bool hasTie)
     {
-        throw new NotImplementedException();
+        if (measureId >= _levelData.Measures.Count) throw new Exception(_measureOutOfBounds);
+        if (!IsProperSubBeat(measureId, subBeat)) throw new Exception(_subBeatOutOfBounds);
+            
+        RhythmicValue rhythmicValue = _levelData.Measures[measureId].RhythmicValues[subBeat];
+
+        if (rhythmicValue != null)
+        {
+            rhythmicValue.HasTie = hasTie;
+        }
     }
 
     /// <summary>
@@ -171,6 +225,8 @@ public class LevelControllerData
     /// <returns>A <see cref="TimeSignature"/>.</returns>
     public TimeSignature GetTimeSignatureOfMeasure(int measureId)
     {
+        if (measureId >= _levelData.Measures.Count) throw new Exception(_measureOutOfBounds);
+        
         return _levelData.Measures[measureId].TimeSignature;
     }
 
