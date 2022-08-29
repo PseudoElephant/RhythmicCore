@@ -23,6 +23,8 @@ public class LevelControllerData
     }
 
     #region Methods
+
+    #region Triggers
     
     /// <summary>
     /// Adds a trigger of the given type, at the specified sub-beat and measure, to the level data.
@@ -34,7 +36,7 @@ public class LevelControllerData
     {
         //TODO: Note, may be useful to return a copy of the trigger object instead and ask for a trigger instead of a type
         
-        if (measureId >= _levelData.Measures.Count) throw new Exception(_measureOutOfBounds);
+        if (!IsProperMeasure(measureId)) throw new Exception(_measureOutOfBounds);
         if (!IsProperSubBeat(measureId, subBeat)) throw new Exception(_subBeatOutOfBounds);
         
         Dictionary<int, List<Trigger>> triggers = _levelData.Measures[measureId].Triggers;
@@ -63,7 +65,7 @@ public class LevelControllerData
     /// <returns>True if the trigger is successfully removed, false otherwise</returns>
     public bool RemoveTrigger(int measureId, int subBeat, Guid triggerID)
     {
-        if (measureId >= _levelData.Measures.Count) throw new Exception(_measureOutOfBounds);
+        if (!IsProperMeasure(measureId)) throw new Exception(_measureOutOfBounds);
         if (!IsProperSubBeat(measureId, subBeat)) throw new Exception(_subBeatOutOfBounds);
         
         Dictionary<int, List<Trigger>> triggers = _levelData.Measures[measureId].Triggers;
@@ -86,7 +88,7 @@ public class LevelControllerData
     /// <returns>A Dictionary containing all of the triggers. The key is the sub-beat, and the value is a list of type <see cref="Trigger"/> which contains the triggers at the specified sub-beat. </returns>
     public Dictionary<int, List<Trigger>> GetTriggersOnMeasure(int measureId)
     {
-        if (measureId >= _levelData.Measures.Count) throw new Exception(_measureOutOfBounds);
+        if (!IsProperMeasure(measureId)) throw new Exception(_measureOutOfBounds);
         
         return _levelData.Measures[measureId].Triggers;
     }
@@ -99,21 +101,25 @@ public class LevelControllerData
     /// <returns>A list of type <see cref="Trigger"/> with all the triggers at the specified sub-beat.</returns>
     public List<Trigger> GetTriggersAtPosition(int measureId, int subBeat)
     {
-        if (measureId >= _levelData.Measures.Count) throw new Exception(_measureOutOfBounds);
+        if (!IsProperMeasure(measureId)) throw new Exception(_measureOutOfBounds);
         if (!IsProperSubBeat(measureId, subBeat)) throw new Exception(_subBeatOutOfBounds);
 
         return _levelData.Measures[measureId].Triggers[subBeat];
     }
+    
+    #endregion
 
+    #region RhythmicValues
+    
     /// <summary>
     /// Adds a RhythmicValue of the given type, at the specified measure and sub-beat, to the level data.
     /// </summary>
     /// <param name="measureId">An in representing the ID of the measure to which to add the rhythmic value.</param>
     /// <param name="subBeat">An int representing the sub-beat of the rhythmic value within the measure.</param>
     /// <param name="type">The <see cref="RhythmicValue.RhythmicValueType"/> representing the type of rhythmic value.</param>
-    public void AddRhythmicValue(int measureId, int subBeat, RhythmicValue.RhythmicValueType type)
+    public RhythmicValue AddRhythmicValue(int measureId, int subBeat, RhythmicValue.RhythmicValueType type)
     {
-        if (measureId >= _levelData.Measures.Count) throw new Exception(_measureOutOfBounds);
+        if (!IsProperMeasure(measureId)) throw new Exception(_measureOutOfBounds);
         if (!IsProperSubBeat(measureId, subBeat)) throw new Exception(_subBeatOutOfBounds);
         
         Dictionary<int, RhythmicValue> rhythmicValues = _levelData.Measures[measureId].RhythmicValues;
@@ -124,11 +130,11 @@ public class LevelControllerData
         if (!rhythmicValues.ContainsKey(subBeat)) // If there is no prev note
         {
             rhythmicValues.Add(subBeat, newRhythmicValue);
-            return;
+            return newRhythmicValue;
         }
-        
-        //TODO: What to do if there is already a note? Replace? Exception? Add code below
-        // Code here
+
+        rhythmicValues[subBeat] = newRhythmicValue;
+        return newRhythmicValue;
     }
 
     /// <summary>
@@ -139,7 +145,7 @@ public class LevelControllerData
     /// <returns>True if removed, otherwise false.</returns>
     public bool RemoveRhythmicValue(int measureId, int subBeat)
     {
-        if (measureId >= _levelData.Measures.Count) throw new Exception(_measureOutOfBounds);
+        if (!IsProperMeasure(measureId)) throw new Exception(_measureOutOfBounds);
         if (!IsProperSubBeat(measureId, subBeat)) throw new Exception(_subBeatOutOfBounds);
         
         Dictionary<int, RhythmicValue> rhythmicValues = _levelData.Measures[measureId].RhythmicValues;
@@ -154,7 +160,7 @@ public class LevelControllerData
     /// <returns>A Dictionary containing all of the rhythmic values. The key is the sub-beat, and the value is <see cref="RhythmicValue"/>. </returns>
     public Dictionary<int, RhythmicValue> GetRhythmicValuesOnMeasure(int measureId)
     {
-        if (measureId >= _levelData.Measures.Count) throw new Exception(_measureOutOfBounds);
+        if (!IsProperMeasure(measureId)) throw new Exception(_measureOutOfBounds);
         
         return _levelData.Measures[measureId].RhythmicValues;
     }
@@ -167,7 +173,7 @@ public class LevelControllerData
     /// <returns>A <see cref="RhythmicValue"/> representing the note or rest at the given measure and sub-beat.</returns>
     public RhythmicValue GetRhythmicValueAtPosition(int measureId, int subBeat)
     {
-        if (measureId >= _levelData.Measures.Count) throw new Exception(_measureOutOfBounds);
+        if (!IsProperMeasure(measureId)) throw new Exception(_measureOutOfBounds);
         if (!IsProperSubBeat(measureId, subBeat)) throw new Exception(_subBeatOutOfBounds);
 
         Dictionary<int, RhythmicValue> rhythmicValues = _levelData.Measures[measureId].RhythmicValues;
@@ -179,7 +185,7 @@ public class LevelControllerData
 
         return rhythmicValues[subBeat];
     }
-
+    
     /// <summary>
     /// Sets the IsDotted property of the <see cref="RhythmicValue"/> at the given measure and sub-beat.
     /// </summary>
@@ -188,7 +194,7 @@ public class LevelControllerData
     /// <param name="isDotted">A bool representing if the value is to be dotted or not.</param>
     public void SetRhythmicValueIsDottedAtPosition(int measureId, int subBeat, bool isDotted)
     {
-        if (measureId >= _levelData.Measures.Count) throw new Exception(_measureOutOfBounds);
+        if (!IsProperMeasure(measureId)) throw new Exception(_measureOutOfBounds);
         if (!IsProperSubBeat(measureId, subBeat)) throw new Exception(_subBeatOutOfBounds);
             
         RhythmicValue rhythmicValue = _levelData.Measures[measureId].RhythmicValues[subBeat];
@@ -207,7 +213,7 @@ public class LevelControllerData
     /// <param name="hasTie">A bool representing if the value is to be tied to the next note or not.</param>
     public void SetRhythmicValueHasTieAtPosition(int measureId, int subBeat, bool hasTie)
     {
-        if (measureId >= _levelData.Measures.Count) throw new Exception(_measureOutOfBounds);
+        if (!IsProperMeasure(measureId)) throw new Exception(_measureOutOfBounds);
         if (!IsProperSubBeat(measureId, subBeat)) throw new Exception(_subBeatOutOfBounds);
             
         RhythmicValue rhythmicValue = _levelData.Measures[measureId].RhythmicValues[subBeat];
@@ -218,6 +224,10 @@ public class LevelControllerData
         }
     }
 
+    #endregion
+
+    #region TimeSignature
+    
     /// <summary>
     /// Returns the <see cref="TimeSignature"/> of the specified measure.
     /// </summary>
@@ -225,22 +235,69 @@ public class LevelControllerData
     /// <returns>A <see cref="TimeSignature"/>.</returns>
     public TimeSignature GetTimeSignatureOfMeasure(int measureId)
     {
-        if (measureId >= _levelData.Measures.Count) throw new Exception(_measureOutOfBounds);
-        
+        if (!IsProperMeasure(measureId)) throw new Exception(_measureOutOfBounds);
+
         return _levelData.Measures[measureId].TimeSignature;
     }
 
     /// <summary>
-    /// Changes the time signature of a measure. It will reorganize and calculate all measures to the right of the specified measure.
+    /// Changes the time signature of a measure, returns true if changed successfully. <b>Will only change time signature if measure is empty.</b>
     /// </summary>
     /// <param name="measureId">An int representing the ID of the measure to which to change the time signature.</param>
     /// <param name="newTimeSignature">A <see cref="TimeSignature"/> specifying the new time signature.</param>
-    public void ChangeTimeSignatureOfMeasure(int measureId, TimeSignature newTimeSignature)
+    /// <returns>True if time signature is successfully changed, otherwise false.</returns>
+    public bool ChangeTimeSignatureOfMeasure(int measureId, TimeSignature newTimeSignature)
     {
+        if (!MeasureIsEmpty(measureId)) return false; //This handles measureId outOfBounds error.
+        
         _levelData.Measures[measureId].TimeSignature = newTimeSignature;
-        //TODO: Think properly if you have to reorganize all _rhythmic values and triggers here
+        return true;
+    }
+    
+    #endregion
+
+    #region Measures
+    
+    /// <summary>
+    /// Returns a Measure array with all measure on the level.
+    /// </summary>
+    /// <returns>An array of type <see cref="Measure"/></returns>
+    public Measure[] GetMeasures()
+    {
+        Measure[] measures = new Measure[_levelData.Measures.Count];
+        _levelData.Measures.CopyTo(measures);
+
+        return measures;
+    }
+    
+    /// <summary>
+    /// Adds a new empty measure at the end of the last existing measure.
+    /// </summary>
+    public void AddEmptyMeasure()
+    {
+        // Empty measure to add
+        Measure newMeasure = new Measure();
+        newMeasure.Triggers = new Dictionary<int, List<Trigger>>();
+        newMeasure.RhythmicValues = new Dictionary<int, RhythmicValue>();
+        newMeasure.TimeSignature = _levelData.Measures[_levelData.Measures.Count - 1].TimeSignature;
+        
+        // Add Measure
+        _levelData.Measures.Add(newMeasure);
     }
 
+    /// <summary>
+    /// Removes the rightmost measure, note that it must be empty. Returns true if removed successfully, otherwise false. It will not remove the measure if it is the only measure in the level.
+    /// </summary>
+    /// <returns>True if measure is removed successfully, otherwise false.</returns>
+    public bool RemoveEmptyMeasure()
+    {
+        if (_levelData.Measures.Count == 1) return false; // If it's the last measure
+        if (!MeasureIsEmpty(_levelData.Measures.Count - 1)) return false; // If it's not empty
+        
+        _levelData.Measures.RemoveAt(_levelData.Measures.Count -1);
+        return true;
+    }
+    
     /// <summary>
     /// Returns <c>true</c> if there are <b>no</b> triggers <i>and</i> rhythmic values on the measure.
     /// </summary>
@@ -258,7 +315,7 @@ public class LevelControllerData
     /// <returns>A bool representing if it has rhythmic values or not.</returns>
     public bool MeasureHasNoRhythmicValues(int measureId)
     {
-        if (measureId >= _levelData.Measures.Count) throw new Exception(_measureOutOfBounds);
+        if (!IsProperMeasure(measureId)) throw new Exception(_measureOutOfBounds);
         
         return _levelData.Measures[measureId].RhythmicValues.Count == 0;
     }
@@ -270,10 +327,12 @@ public class LevelControllerData
     /// <returns>A bool representing if it has triggers or not.</returns>
     public bool MeasureHasNoTriggers(int measureId)
     {
-        if (measureId >= _levelData.Measures.Count) throw new Exception(_measureOutOfBounds);
+        if (!IsProperMeasure(measureId)) throw new Exception(_measureOutOfBounds);
         
         return _levelData.Measures[measureId].Triggers.Count == 0;
     }
+    
+    #endregion
     
     #endregion
 
@@ -287,8 +346,17 @@ public class LevelControllerData
     /// <returns></returns>
     private bool IsProperSubBeat(int measureId, int subBeat)
     {
-        return _levelData.Measures[measureId].TimeSignature.Nominator * BeatSubdivisions.Subdivisions > subBeat;
+        return _levelData.Measures[measureId].TimeSignature.Nominator * BeatSubdivisions.Subdivisions > subBeat && subBeat >= 0;
     }
-    
+
+    /// <summary>
+    /// Returns true if measure is proper, otherwise false.
+    /// </summary>
+    /// <param name="measureId">An int representing the measureID.</param>
+    private bool IsProperMeasure(int measureId)
+    {
+        return (measureId < _levelData.Measures.Count && measureId >= 0);
+    }
+
     #endregion
 }

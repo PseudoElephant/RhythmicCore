@@ -25,7 +25,7 @@ public class LevelControllerConfig
     {
         return _levelConfig.LevelName;
     }
-
+    
     /// <summary>
     /// Changes the level name to the given value.
     /// </summary>

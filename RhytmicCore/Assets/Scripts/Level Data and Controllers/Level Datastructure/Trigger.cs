@@ -8,8 +8,7 @@ public class Trigger
         Particle,
         Bpm,
         BgPulse,
-        BgChange,
-        TimeSignature
+        BgChange
     }
 
     public Guid TriggerID { get; } = new Guid();
