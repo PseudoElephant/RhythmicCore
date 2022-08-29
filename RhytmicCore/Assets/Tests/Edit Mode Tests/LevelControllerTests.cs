@@ -16,13 +16,13 @@ public class LevelControllerTests
         Assert.NotNull(_levelControllerControl.Config);
         Assert.NotNull(_levelControllerControl.Data);
 
-        Assert.AreEqual(120, _levelControllerControl.Config.GetInitialBpm());
-        Assert.AreEqual(new TimeSignature() {Denominator = 4, Nominator = 4} , _levelControllerControl.Config.GetInitialTimeSignature());
-        Assert.AreEqual(0f, _levelControllerControl.Config.GetSongOffset());
-        Assert.AreEqual("#000000",_levelControllerControl.Config.GetInitialBgColor());
-        Assert.AreEqual("Song Name",_levelControllerControl.Config.GetSongName());
-        Assert.AreEqual("New Level",_levelControllerControl.Config.GetLevelName());
-        Assert.AreEqual("Author Name",_levelControllerControl.Config.GetLevelAuthor());
+        Assert.AreEqual(DefaultLevelValues.InitialBpm, _levelControllerControl.Config.GetInitialBpm());
+        Assert.AreEqual(DefaultLevelValues.InitialTimeSignature, _levelControllerControl.Config.GetInitialTimeSignature());
+        Assert.AreEqual(DefaultLevelValues.SongOffset, _levelControllerControl.Config.GetSongOffset());
+        Assert.AreEqual(DefaultLevelValues.InitialBgColor,_levelControllerControl.Config.GetInitialBgColor());
+        Assert.AreEqual(DefaultLevelValues.SongName,_levelControllerControl.Config.GetSongName());
+        Assert.AreEqual(DefaultLevelValues.LevelName,_levelControllerControl.Config.GetLevelName());
+        Assert.AreEqual(DefaultLevelValues.AuthorName,_levelControllerControl.Config.GetLevelAuthor());
     
     
         Assert.AreEqual(1, _levelControllerControl.Data.GetMeasures().Length);
@@ -30,6 +30,6 @@ public class LevelControllerTests
         Measure measure = _levelControllerControl.Data.GetMeasures()[0];
         Assert.AreEqual(0, measure.Triggers.Count);
         Assert.AreEqual(0, measure.RhythmicValues.Count);
-        Assert.AreEqual(new TimeSignature() {Denominator = 4, Nominator = 4} , measure.TimeSignature);
+        Assert.AreEqual(DefaultLevelValues.InitialTimeSignature, measure.TimeSignature);
     }
 }
