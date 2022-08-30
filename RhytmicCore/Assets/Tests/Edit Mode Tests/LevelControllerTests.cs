@@ -23,8 +23,8 @@ public class LevelControllerTests
         Assert.AreEqual(DefaultLevelValues.SongName,_levelControllerControl.Config.GetSongName());
         Assert.AreEqual(DefaultLevelValues.LevelName,_levelControllerControl.Config.GetLevelName());
         Assert.AreEqual(DefaultLevelValues.AuthorName,_levelControllerControl.Config.GetLevelAuthor());
-    
-    
+        Assert.AreEqual(DefaultLevelValues.LevelDescription, _levelControllerControl.Config.GetLevelDescription());
+        
         Assert.AreEqual(1, _levelControllerControl.Data.GetMeasures().Length);
     
         Measure measure = _levelControllerControl.Data.GetMeasures()[0];

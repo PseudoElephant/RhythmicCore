@@ -72,5 +72,6 @@ public class LevelController
         config.SongName = DefaultLevelValues.SongName;
         config.SongOffset = DefaultLevelValues.SongOffset;
         config.InitialBgColor = DefaultLevelValues.InitialBgColor;
+        config.LevelDescription = DefaultLevelValues.LevelDescription;
     }
 }

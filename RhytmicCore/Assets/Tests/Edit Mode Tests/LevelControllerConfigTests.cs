@@ -1,9 +1,14 @@
 using System;
 using NUnit.Framework;
+using UnityEngine;
 
 public class LevelControllerConfigTests
 {
     private LevelController _levelControllerControl;
+    
+    private const string _invalidBpmError = "The bpm you entered is not valid.";
+    private const string _invalidSongOffset = "The song offset provided is not valid.";
+    private const string _invalidTimeSignature = "The time signature provided is invalid.";
 
     [SetUp]
     public void LevelDataSetup()
@@ -60,11 +65,19 @@ public class LevelControllerConfigTests
     }
 
     [Test]
+    public void LevelDescriptionTests()
+    {
+        Assert.AreEqual(DefaultLevelValues.LevelDescription, _levelControllerControl.Config.GetLevelDescription());
+        _levelControllerControl.Config.SetLevelDescription("This is my new cool level!");
+        Assert.AreEqual("This is my new cool level!", _levelControllerControl.Config.GetLevelDescription());
+    }
+    
+    [Test]
     public void InitialBgColorTests()
     {
-        Assert.AreEqual("#000000", _levelControllerControl.Config.GetInitialBgColor());
-        _levelControllerControl.Config.SetInitialBgColor("#272727");
-        Assert.AreEqual("#272727", _levelControllerControl.Config.GetInitialBgColor());
+        Assert.AreEqual(new Color(0,0,0), _levelControllerControl.Config.GetInitialBgColor());
+        _levelControllerControl.Config.SetInitialBgColor(new Color(27,27,27));
+        Assert.AreEqual(new Color(27,27,27), _levelControllerControl.Config.GetInitialBgColor());
     }
 
     [Test]
@@ -79,5 +92,33 @@ public class LevelControllerConfigTests
         Assert.AreEqual(DefaultLevelValues.SongName,config.SongName);
         Assert.AreEqual(DefaultLevelValues.LevelName,config.LevelName);
         Assert.AreEqual(DefaultLevelValues.AuthorName,config.AuthorName);
+        Assert.AreEqual(DefaultLevelValues.LevelDescription, config.LevelDescription);
+    }
+
+    [Test]
+    public void ConfigExceptionTests()
+    {
+        // BPM
+        Exception exception = Assert.Throws<Exception>(
+            () => _levelControllerControl.Config.SetInitialBpm(-1));
+        
+        Assert.That(exception.Message, Is.EqualTo(_invalidBpmError));
+        
+        // Song Offset
+        exception = Assert.Throws<Exception>(
+            () => _levelControllerControl.Config.SetSongOffset(-1));
+        
+        Assert.That(exception.Message, Is.EqualTo(_invalidSongOffset));
+        
+        // Time signature
+        exception = Assert.Throws<Exception>(
+            () => _levelControllerControl.Config.SetInitialTimeSignature(new TimeSignature() {Nominator = -1, Denominator = 4}));
+        
+        Assert.That(exception.Message, Is.EqualTo(_invalidTimeSignature));
+        
+        exception = Assert.Throws<Exception>(
+            () => _levelControllerControl.Config.SetInitialTimeSignature(new TimeSignature() {Nominator = 4, Denominator = -8}));
+        
+        Assert.That(exception.Message, Is.EqualTo(_invalidTimeSignature));
     }
 }

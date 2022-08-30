@@ -1,3 +1,6 @@
+using System;
+using UnityEngine;
+
 /// <summary>
 /// Class in charge of handling the <see cref="LevelConfig"/> data section of the <see cref="Level"/> class.
 /// <b>Note: this class is intended to only be used through <see cref="LevelController"/>.</b>
@@ -5,6 +8,15 @@
 public class LevelControllerConfig
 {
     private LevelConfig _levelConfig;
+    
+    private const int _maxLevelNameStringLength = 30;
+    private const int _maxAuthorNameStringLength = 20;
+    private const int _maxSongNameStringLength = 30;
+    private const int _maxLevelDescriptionStringLength = 120;
+    
+    private const string _invalidBpmError = "The bpm you entered is not valid.";
+    private const string _invalidSongOffset = "The song offset provided is not valid.";
+    private const string _invalidTimeSignature = "The time signature provided is invalid.";
 
     /// <summary>
     /// Initializes <see cref="LevelControllerConfig"/> with the current <see cref="LevelConfig"/> data.
@@ -27,11 +39,16 @@ public class LevelControllerConfig
     }
     
     /// <summary>
-    /// Changes the level name to the given value.
+    /// Changes the level name to the given value. If a string exceeds the max length it will be cropped.
     /// </summary>
     /// <param name="levelName">the new level name.</param>
     public void SetLevelName(string levelName)
     {
+        if (levelName.Length > _maxLevelNameStringLength)
+        {
+            levelName = levelName.Substring(0, _maxLevelNameStringLength);
+        }
+        
         _levelConfig.LevelName = levelName;
     }
 
@@ -45,12 +62,39 @@ public class LevelControllerConfig
     }
 
     /// <summary>
-    /// Changes the level author to the given value.
+    /// Changes the level author to the given value. If a string exceeds the max length it will be cropped.
     /// </summary>
     /// <param name="authorName">the new author's name.</param>
     public void SetLevelAuthor(string authorName)
     {
+        if (authorName.Length > _maxAuthorNameStringLength)
+        {
+            authorName = authorName.Substring(0, _maxAuthorNameStringLength);
+        }
         _levelConfig.AuthorName = authorName;
+    }
+
+    /// <summary>
+    /// Returns the current level description.
+    /// </summary>
+    /// <returns>A string representing the current level description.</returns>
+    public string GetLevelDescription()
+    {
+        return _levelConfig.LevelDescription;
+    }
+
+    /// <summary>
+    /// Sets the level description to the provided string. If a string exceeds the max length it will be cropped.
+    /// </summary>
+    /// <param name="levelDescription">A string representing the level description.</param>
+    public void SetLevelDescription(string levelDescription)
+    {
+        if (levelDescription.Length > _maxLevelDescriptionStringLength)
+        {
+            levelDescription = levelDescription.Substring(0, _maxLevelDescriptionStringLength);
+        }
+
+        _levelConfig.LevelDescription = levelDescription;
     }
 
     /// <summary>
@@ -63,11 +107,16 @@ public class LevelControllerConfig
     }
 
     /// <summary>
-    /// Changes the song's name to the given value.
+    /// Changes the song's name to the given value. If a string exceeds the max length it will be cropped.
     /// </summary>
     /// <param name="songName">the new son's name.</param>
     public void SetSongName(string songName)
     {
+        if (songName.Length > _maxSongNameStringLength)
+        {
+            songName = songName.Substring(0, _maxSongNameStringLength);
+        }
+        
         _levelConfig.SongName = songName;
     }
 
@@ -86,6 +135,8 @@ public class LevelControllerConfig
     /// <param name="bpm">the new bpm of the level.</param>
     public void SetInitialBpm(int bpm)
     {
+        if (bpm <= 0) throw new Exception(_invalidBpmError);
+        
         _levelConfig.InitialBpm = bpm;
     }
 
@@ -104,6 +155,8 @@ public class LevelControllerConfig
     /// <param name="offset">the new offset amount, in seconds.</param>
     public void SetSongOffset(float offset)
     {
+        if (offset < 0) throw new Exception(_invalidSongOffset);
+        
         _levelConfig.SongOffset = offset;
     }
 
@@ -122,6 +175,8 @@ public class LevelControllerConfig
     /// <param name="timeSignature">the new initial <see cref="TimeSignature"/> of the level.</param>
     public void SetInitialTimeSignature(TimeSignature timeSignature)
     {
+        if (timeSignature.Nominator <= 0 || timeSignature.Denominator <= 0) throw new Exception(_invalidTimeSignature);
+        
         _levelConfig.InitialTimeSignature = timeSignature;
     }
 
@@ -129,7 +184,7 @@ public class LevelControllerConfig
     /// Returns the hex representation of the initial background color.
     /// </summary>
     /// <returns>A string representing the hex representation of the background color. (e.x. "#A72B27")</returns>
-    public string GetInitialBgColor()
+    public Color GetInitialBgColor()
     {
         return _levelConfig.InitialBgColor;
     }
@@ -143,7 +198,7 @@ public class LevelControllerConfig
     /// This sets the initial background color to white.
     /// </example>
     /// <param name="color">A string of the hex representation of a color.</param>
-    public void SetInitialBgColor(string color)
+    public void SetInitialBgColor(Color color)
     {
         _levelConfig.InitialBgColor = color;
     }
